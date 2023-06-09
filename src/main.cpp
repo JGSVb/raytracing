@@ -57,7 +57,7 @@ void graphics_quit(void){
 	SDL_Quit();
 }
 
-void plot_pixel(int x, int y, double r, double g, double b, double a){
+void plot_pixel(int x, int y, double r, double g, double b){
 	SDL_SetRenderDrawColor(G_app.renderer, r*255, g*255, b*255, 255);
 	SDL_RenderDrawPoint(G_app.renderer, x, y);
 }
@@ -70,22 +70,6 @@ bool compute_events(void){
 			case SDL_QUIT:
 				return false;
 				break;
-			case SDL_KEYDOWN: {
-				switch(ev.key.keysym.sym){
-					case(SDLK_LEFT):
-						G_app.camera->dir.x += 0.01;
-						G_app.camera->dir = vec3_normalize(G_app.camera->dir);
-						break;
-					case(SDLK_RIGHT):
-						G_app.camera->dir.x -= 0.01;
-						G_app.camera->dir = vec3_normalize(G_app.camera->dir);
-						break;
-					default:
-						break;
-
-				}
-				break;
-			}
 			default:
 				break;
 		}
@@ -97,8 +81,8 @@ bool compute_events(void){
 void graphics_show_image(Image *img){
 	for(int yy = 0; yy < img->hei; yy++){
 		for(int xx = 0; xx < img->wid; xx++){
-			Color pixel = image_get_color(img, xx,yy);
-			plot_pixel(xx, yy, pixel.r, pixel.g, pixel.b, pixel.a);
+			Color3 pixel = image_get_color(img, xx,yy);
+			plot_pixel(xx, yy, pixel.x, pixel.y, pixel.z);
 		}
 	}
 }
@@ -107,15 +91,15 @@ int main(int argc, char **argv){
 
 	render_init();
 
-	Camera cam = {(Vec3){0, 0, 0}, (Vec3){0, 0, 1}};
+	Camera cam = {Vec3(), Vec3()};
 	G_app.camera = &cam;
 
 	Sphere sph1 = {
-		.center = (Vec3){0,0,1},
+		.center = Vec3(0,0,1),
 		.r = 0.05,
 	};
 	Material mat1 = {
-		.col = (Color){1,0,0,1},
+		.col = Color3(1,0,0),
 	};
 
 	Hittable hit1;
